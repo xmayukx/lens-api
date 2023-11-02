@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+require("dotenv").config();
 import express, { Request, Response } from "express";
 
 import {
@@ -58,10 +59,14 @@ router.post("/login", async (req: Request, res: Response) => {
     return res.status(500).send({ mesg: "Internal server error", error });
   }
 });
-
+type Profile = {
+  handle: string;
+  evmAddress: string;
+  pvtKey: string;
+};
 router.post("/create-profile", async (req: Request, res: Response) => {
-  console.log(req.body);
   const { handle, evmAddress, pvtKey } = req.body;
+
   const wallet = new ethers.Wallet(pvtKey);
   const address = await wallet.getAddress();
   console.log(`Creating a new profile for ${address} with handle "${handle}"`);

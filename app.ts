@@ -16,7 +16,7 @@ const corsOpts = {
 
   allowedHeaders: ["Content-Type"],
 };
-
+app.use(express.json());
 app.use(cors(corsOpts));
 app.use(
   bodyParser.urlencoded({
