@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response } from "express";
+
 import {
   ChangeProfileManagerActionType,
   LensClient,
@@ -11,14 +12,12 @@ import {
 
 import { Wallet, ethers } from "ethers";
 const router = express.Router();
-// const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!);
+
 const lensClient = new LensClient({
   environment: development,
 });
-// const handle = "hrishan1";
-// const handle = "popo41";
 
-router.get("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
   const { pvtKey, handle } = req.body;
   try {
     const wallet = new ethers.Wallet(pvtKey);
@@ -28,12 +27,6 @@ router.get("/login", async (req: Request, res: Response) => {
         ownedBy: [address],
       },
     });
-
-    // console.log(
-    //   `All owned profiles: `,
-    //   allOwnedProfiles.items.map((i) => ({ id: i.id, handle: i.handle }))
-    // );
-
     const newProfile = allOwnedProfiles.items.find(
       (item) => item.handle?.fullHandle == `test/${handle}`
     );
@@ -68,7 +61,7 @@ router.get("/login", async (req: Request, res: Response) => {
 
 router.post("/create-profile", async (req: Request, res: Response) => {
   console.log(req.body);
-  const { handle, evmAddress, pvtKey } = await req.body;
+  const { handle, evmAddress, pvtKey } = req.body;
   const wallet = new ethers.Wallet(pvtKey);
   const address = await wallet.getAddress();
   console.log(`Creating a new profile for ${address} with handle "${handle}"`);
@@ -119,26 +112,9 @@ router.post("/create-profile", async (req: Request, res: Response) => {
   }
 });
 
-// router.get("/get-profile", async (req: Request, res: Response) => {
-//   const address = await wallet.getAddress();
-//   try {
-//     const allOwnedProfiles = await lensClient.profile.fetchAll({
-//       where: { ownedBy: ["0xa117c1c72942881AE79e7491caaf8063ceEafd2a"] },
-//     });
-
-//     console.log(
-//       `Profiles owned by address: ${address}: `,
-//       allOwnedProfiles.items.map((i) => ({ id: i.id, handle: i.handle }))
-//     );
-
-//     res.send({ mesg: allOwnedProfiles }).status(200);
-//   } catch (error) {
-//     console.log("Error:" + error);
-//   }
-// });
-
 router.post("/enable-dispatcher", async (req: Request, res: Response) => {
   const { handle } = req.body;
+
   const isAuthenticated = await lensClient.authentication.isAuthenticated();
   if (!isAuthenticated) {
     return res.status(401).send({ mesg: "Not Authenticated" });
@@ -213,12 +189,13 @@ router.post("/create-post", async (req: Request, res: Response) => {
   if (!isAuthenticated) {
     return res.status(401).send({ mesg: "Not Authenticated" });
   }
+
   const wallet = new Wallet(process.env.PRIVATE_KEY!);
   if (!wallet.address) {
     return res.status(401).send({ mesg: "Wallet not found" });
   }
   const result = await lensClient.publication.postOnchain({
-    contentURI: text, // or arweave
+    contentURI: text,
   });
 
   const resultValue = result.unwrap();
