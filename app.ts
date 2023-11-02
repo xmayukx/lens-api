@@ -1,7 +1,7 @@
 import express, { Express, Request, Response, Application } from "express";
 import axios from "axios";
 import dotenv from "dotenv";
-import router from "./routes";
+import router from "./src/routes";
 import bodyParser from "body-parser";
 
 //For env File
